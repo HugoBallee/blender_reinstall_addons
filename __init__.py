@@ -1,11 +1,3 @@
-bl_info = {
-    "name": "Reinstall addon(s)",
-    "author": "Jos Vromans",
-    "version": (0, 0, 1),
-    "blender": (2, 92, 0),
-    "location": "Addons -> Reinstall add-on(s)",
-    "description": "Reinstall custom add-ons after code changes",
-}
 import shutil
 import sys
 from importlib import reload
@@ -16,29 +8,29 @@ import addon_utils
 
 
 class MyAddons_OT_add(bpy.types.Operator):
-    bl_idname = "my_addons.add"
+    bl_idname = f'blender_reinstall_addons.add'
     bl_label = "Add the path to a personal add-on"
     bl_options = {'REGISTER'}
 
     def execute(self, context):
-        context.preferences.addons[__name__].preferences.my_addons.add()
+        context.preferences.addons[__package__].preferences.my_addons.add()
         return {'FINISHED'}
 
 
 class MyAddons_OT_remove(bpy.types.Operator):
-    bl_idname = 'my_addons.remove'
+    bl_idname = f'blender_reinstall_addons.remove'
     bl_label = 'Remove this add-on path'
     bl_options = {'REGISTER'}
 
     index: bpy.props.IntProperty()
 
     def execute(self, context):
-        context.preferences.addons[__name__].preferences.my_addons.remove(self.index)
+        context.preferences.addons[__package__].preferences.my_addons.remove(self.index)
         return {'FINISHED'}
 
 
 class MyAddons_OT_reinstall(bpy.types.Operator):
-    bl_idname = "my_addons.reinstall"
+    bl_idname = f"blender_reinstall_addons.reinstall"
     bl_label = "Reinstall the selected add on"
     bl_options = {'REGISTER'}
 
@@ -53,7 +45,7 @@ class MyAddons_OT_reinstall(bpy.types.Operator):
            (determined by name startswith directory name)
         7) Enable the add-on (by directory name)
         """
-        my_addons = context.preferences.addons[__name__].preferences.my_addons
+        my_addons = context.preferences.addons[__package__].preferences.my_addons
 
         if not any(addon.selected and addon.path != '' for addon in my_addons):
             self.report({'ERROR'}, f"Please add and/or select at least one directory.")
@@ -94,7 +86,7 @@ class MyAddons_OT_reinstall(bpy.types.Operator):
             bpy.ops.preferences.addon_install(filepath=str(zipfile_path), overwrite=True)
             zipfile_path.unlink()
 
-            sys.modules[__name__] = reload(sys.modules[__name__])
+            sys.modules[__package__] = reload(sys.modules[__package__])
             for name, module in list(sys.modules.items()):
                 if name.startswith(f"{addon_name}."):
                     globals()[name] = reload(module)
@@ -151,7 +143,7 @@ class MyAddon(bpy.types.PropertyGroup):
 
 
 class MyAddonPreferences(bpy.types.AddonPreferences):
-    bl_idname = __name__
+    bl_idname = __package__
     my_addons: bpy.props.CollectionProperty(type=MyAddon)
 
     def draw(self, context):
@@ -166,7 +158,7 @@ class MyAddonPreferences(bpy.types.AddonPreferences):
         row.label(text="List of your local add-on development directories.")
         row.scale_x = 0.8
         row = label_row.row(align=True)
-        row.operator('my_addons.add', text='Add directory', icon='ADD')
+        row.operator(f'blender_reinstall_addons.add', text='Add directory', icon='ADD')
         row.scale_x = 0.2
 
         for index, my_addon in enumerate(self.my_addons):
@@ -175,11 +167,11 @@ class MyAddonPreferences(bpy.types.AddonPreferences):
             icon = "CHECKBOX_HLT" if my_addon.selected else "CHECKBOX_DEHLT"
             row.prop(my_addon, 'selected', icon=icon, text="", emboss=False)
             row.prop(my_addon, 'path')
-            row.operator('my_addons.remove', text='', icon='TRASH').index = index
+            row.operator(f'blender_reinstall_addons.remove', text='', icon='TRASH').index = index
             row.scale_y = 2.0
 
         row = layout.row()
-        row.operator('my_addons.reinstall', text='Reinstall selected add-ons', icon='FILE_REFRESH')
+        row.operator(f'blender_reinstall_addons.reinstall', text='Reinstall selected add-ons', icon='FILE_REFRESH')
         row.scale_y = 2.0
 
 
@@ -202,8 +194,10 @@ def register():
 
     wm = bpy.context.window_manager
     km = wm.keyconfigs.addon.keymaps.new(name='Window', space_type='EMPTY')
-    kmi = km.keymap_items.new('my_addons.reinstall', 'R', 'PRESS', shift=True, ctrl=True)
+    kmi = km.keymap_items.new(f'blender_reinstall_addons.reinstall', 'R', 'PRESS', shift=True, ctrl=True)
     addon_keymaps.append((km, kmi))
+
+    print(f'package: {__package__}')
 
 
 def unregister():
