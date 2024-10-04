@@ -26,21 +26,21 @@ You can keep track of several directories in the user preferences for this add-o
 - In the add-on preferences for this add-on you can add directory paths to the project(s) you are working on.
 - Make sure to select the project(s) that needs to be reinstalled
 - By hitting the button in the user preferences, the selected add-on(s) will be reinstalled.
-- Ctrl + Shift + R (for re-install) is the hotkey. 
+- Ctrl + Shift + R (for re-install) is the hotkey.
   
 So when this is set up, you only have to hit the hotkey, and look at the report message on the bottom of Blender 
   and keep an eye on the Python console.
 
 
 ## This is an experiment
-There are many ways to achieve a similar result. 
+There are many ways to achieve a similar result.
 The most popular is to add extra code in your project, for development purposes only, that checks if modules have to be reloaded.
 When your project is linked with Blender, add-on changes can be picked up automatically.
 That might be the first solution you could try.
 
 The disadvantages of that solution are.
 - the additional code has to be removed every time you share the add-on, and added everytime you work on another add-on.
-- there is no proper feedback on the actual reloading / reinstall action. 
+- there is no proper feedback on the actual reloading / reinstall action.
   
 I don't might to hit one action purposely to launch a re-installation (and watch the feedback). 
 Furthermore, I like a real re-install from time to time, by installing the add-on with a zipfile, exactly as another user would. 
@@ -52,7 +52,7 @@ Some discussion on this topic: https://developer.blender.org/T67387
 
 ## Known bugs / issues
 - This add-on does not work with single file add-ons, only with directories. (non bug)
-- Unregister for this add-on 'reinstall_addons' can give an error in some cases. 
+- Unregister for this add-on 'reinstall_addons' can give an error in some cases.
   (only after some loading / unloading of other add-ons was done..)
   
 ## General troubleshooting
